@@ -47,7 +47,6 @@ private struct Constants {
     static let resetLinesPositionAnimDuration: TimeInterval = 0.2
     static let finishLoadingAnimDuration: TimeInterval  = 0.3
     static let bounceDuration: TimeInterval  = 0.3
-    static let borderWidth: CGFloat = 5
     static let minFontSize: CGFloat = 17
     static let maxFontSize: CGFloat = 19
     static let minOpacity: Float = 0
@@ -103,8 +102,14 @@ open class SubmitButton: UIButton {
             borderLayer.borderColor = borderColor.cgColor
         }
     }
+    /// Border Width
+    @IBInspectable open var borderWidth: CGFloat = 5 {
+        didSet {
+            borderLayer.borderWidth = borderWidth
+        }
+    }
     /// Lines count on loading state
-    open var linesCount: UInt = 2
+    @IBInspectable open var linesCount: UInt = 2
     /// Measure in radians
     @IBInspectable open var dotLength: CGFloat = 0.1
     /// Time for pass one lap
@@ -141,7 +146,7 @@ open class SubmitButton: UIButton {
     // MARK: - Private Vars
     fileprivate lazy var borderLayer: CALayer = {
         let layer =  CALayer()
-        layer.borderWidth = Constants.borderWidth
+        layer.borderWidth = self.borderWidth
         layer.borderColor = self.borderColor.cgColor
         layer.backgroundColor = nil
         return layer
@@ -240,7 +245,7 @@ open class SubmitButton: UIButton {
         layer.backgroundColor = startBackgroundColor.cgColor
         checkMarkLayer.opacity = Constants.minOpacity
         errorCrossMarkLayer.opacity = Constants.minOpacity
-        borderLayer.borderWidth = Constants.borderWidth
+        borderLayer.borderWidth = borderWidth
         borderLayer.borderColor = borderColor.cgColor
         progressLayer.removeFromSuperlayer()
         progressLayer.strokeEnd = Constants.minStrokeEndPosition
@@ -433,7 +438,7 @@ extension SubmitButton {
             line.bounds = circleBounds
             line.strokeColor = dotColor.cgColor
             line.lineWidth = lineWidth
-            line.fillColor = dotColor.cgColor
+            line.fillColor = UIColor.clear.cgColor
             line.lineCap = CAShapeLayerLineCap.round
             layer.insertSublayer(line, above: borderLayer)
             line.position = arCenter

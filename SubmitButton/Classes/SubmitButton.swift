@@ -47,8 +47,6 @@ private struct Constants {
     static let resetLinesPositionAnimDuration: TimeInterval = 0.2
     static let finishLoadingAnimDuration: TimeInterval  = 0.3
     static let bounceDuration: TimeInterval  = 0.3
-    static let minFontSize: CGFloat = 17
-    static let maxFontSize: CGFloat = 19
     static let minOpacity: Float = 0
     static let maxOpacity: Float = 1
     static let minStrokeEndPosition: CGFloat = 0
@@ -288,7 +286,6 @@ open class SubmitButton: UIButton {
                 }
                 return
             }//*
-            titleLabel?.font = UIFont.systemFont(ofSize: Constants.minFontSize)
             guard buttonState != .finished else {
                 return
             }

@@ -120,7 +120,7 @@ open class SubmitButton: UIButton {
     /// Button title color
     @IBInspectable open var startTitleColor: UIColor! = #colorLiteral(red: 0, green: 0.8250309825, blue: 0.6502585411, alpha: 1) {
         didSet {
-            setTitleColor(startTitleColor, for: UIControlState())
+            setTitleColor(startTitleColor, for: UIControl.State())
         }
     }
     /// Show cancel option while loading
@@ -129,7 +129,7 @@ open class SubmitButton: UIButton {
     @IBInspectable open var cancelOptionColor: UIColor = #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 1)
     @IBInspectable open var startText: String = "Submit" {
         didSet {
-            setTitle(startText, for: UIControlState())
+            setTitle(startText, for: UIControl.State())
         }
     }
     open var currState: ButtonState {
@@ -152,9 +152,9 @@ open class SubmitButton: UIButton {
         layer.strokeColor = self.dotColor.cgColor
         layer.bounds = self.circleBounds
         layer.path = UIBezierPath(arcCenter: self.boundsCenter, radius: self.boundsCenter.y - self.lineWidth / 2,
-                                  startAngle: CGFloat(-M_PI_2), endAngle: 3*CGFloat(M_PI_2), clockwise: true).cgPath
+                                  startAngle: CGFloat(-(Double.pi / 2)), endAngle: 3*CGFloat(Double.pi / 2), clockwise: true).cgPath
         layer.strokeEnd = Constants.minStrokeEndPosition
-        layer.lineCap = kCALineCapRound
+        layer.lineCap = CAShapeLayerLineCap.round
         layer.lineWidth = self.lineWidth
         return layer
     }()
@@ -194,7 +194,7 @@ open class SubmitButton: UIButton {
     fileprivate var timer: Timer?
     fileprivate var taskCompletion: CompletionType?
     //intiate the update of the progress of progress bar
-    func updateLoadingProgress() {
+    @objc func updateLoadingProgress() {
         guard progress <= 1 else {
             timer?.invalidate()
             self.stopAnimate()
@@ -245,8 +245,8 @@ open class SubmitButton: UIButton {
         progressLayer.removeFromSuperlayer()
         progressLayer.strokeEnd = Constants.minStrokeEndPosition
         CATransaction.commit()
-        setTitle(startText, for: UIControlState())
-        setTitleColor(startTitleColor, for: UIControlState())
+        setTitle(startText, for: UIControl.State())
+        setTitleColor(startTitleColor, for: UIControl.State())
         titleLabel?.layer.opacity = Constants.maxOpacity
     }
     open func startAnimate() {
@@ -273,7 +273,7 @@ open class SubmitButton: UIButton {
         return CGFloat(progressPerSecond * Constants.frequencyUpdate)
     }()
     // MARK: - Selector && Action
-    func touchUpInside(_ sender: SubmitButton) {
+    @objc func touchUpInside(_ sender: SubmitButton) {
         if self.buttonState != .loading {
             //*Code to reset buton after submit, comment these if not needed
             guard !isSelected else {
@@ -307,11 +307,11 @@ extension SubmitButton {
     }
     //Function to setup button properties
     fileprivate func setupButton() {
-        setTitle(startText, for: UIControlState())
+        setTitle(startText, for: UIControl.State())
         layer.cornerRadius  = bounds.midY
         layer.borderColor = borderColor.cgColor
         layer.addSublayer( borderLayer )
-        setTitleColor(startTitleColor, for: UIControlState())
+        setTitleColor(startTitleColor, for: UIControl.State())
     }
     //Function to remove temporary layer
     fileprivate func clearLayerContext() {
@@ -354,9 +354,9 @@ extension SubmitButton {
         layerGroup.animations = [boundAnim, colorAnim]
         layerGroup.duration = Constants.prepareLoadingAnimDuration
         layerGroup.delegate = self
-        layerGroup.fillMode = kCAFillModeForwards
+        layerGroup.fillMode = CAMediaTimingFillMode.forwards
         layerGroup.isRemovedOnCompletion = false
-        layerGroup.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+        layerGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         assignContext(.LoadingStart, anim: layerGroup)
         layer.add(layerGroup, forKey: AnimKeys.bounds)
     }
@@ -372,9 +372,9 @@ extension SubmitButton {
         borderGroup.animations = [borderAnim, borderBounds, borderPosition]
         borderGroup.duration = Constants.prepareLoadingAnimDuration
         borderGroup.delegate = self
-        borderGroup.fillMode = kCAFillModeForwards
+        borderGroup.fillMode = CAMediaTimingFillMode.forwards
         borderGroup.isRemovedOnCompletion = false
-        borderGroup.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+        borderGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
         assignContext(.LoadingStart, anim: borderGroup)
         borderLayer.add(borderGroup, forKey: nil)
     }
@@ -421,7 +421,7 @@ extension SubmitButton {
         let arCenter = boundsCenter
         let radius   = circleBounds.midX - lineWidth / 2
         var lines = [CAShapeLayer]()
-        let lineOffset: CGFloat = 2 * CGFloat(M_PI) / CGFloat(linesCount)
+        let lineOffset: CGFloat = 2 * CGFloat(Double.pi) / CGFloat(linesCount)
         for i in 0..<linesCount {
             let line = CAShapeLayer()
             let startAngle = lineOffset * CGFloat(i)
@@ -434,7 +434,7 @@ extension SubmitButton {
             line.strokeColor = dotColor.cgColor
             line.lineWidth = lineWidth
             line.fillColor = dotColor.cgColor
-            line.lineCap = kCALineCapRound
+            line.lineCap = CAShapeLayerLineCap.round
             layer.insertSublayer(line, above: borderLayer)
             line.position = arCenter
             lines.append( line )
@@ -442,7 +442,7 @@ extension SubmitButton {
         let opacityAnim = CABasicAnimation(keyPath: AnimKeys.opacity)
         opacityAnim.fromValue = 0
         let rotation = CABasicAnimation(keyPath: AnimKeys.transformRotationZ)
-        rotation.byValue = NSNumber(value: 2*M_PI as Double)
+        rotation.byValue = NSNumber(value: 2*Double.pi as Double)
         rotation.duration = velocity
         rotation.repeatCount = Float.infinity
         for line in lines {
@@ -504,7 +504,7 @@ extension SubmitButton {
         borderBounce.beginTime = CACurrentMediaTime() + Constants.resetLinesPositionAnimDuration
         borderBounce.delegate = self
         borderBounce.isRemovedOnCompletion = false
-        borderBounce.fillMode = kCAFillModeBoth
+        borderBounce.fillMode = CAMediaTimingFillMode.both
         assignContext(.LoadingFinishing, anim: borderBounce)
         borderLayer.add(borderBounce, forKey: nil)
         finishLoadingGroup.enter()
@@ -517,7 +517,7 @@ extension SubmitButton {
         borderPosition.beginTime = CACurrentMediaTime() + Constants.resetLinesPositionAnimDuration
         borderPosition.delegate = self
         borderPosition.isRemovedOnCompletion = false
-        borderPosition.fillMode = kCAFillModeBoth
+        borderPosition.fillMode = CAMediaTimingFillMode.both
         assignContext(.LoadingFinishing, anim: borderPosition)
         borderLayer.add(borderPosition, forKey: nil)
         finishLoadingGroup.enter()
@@ -543,7 +543,7 @@ extension SubmitButton {
         layerGroup.duration = Constants.bounceDuration * Constants.borderBounceKeyTime[1].doubleValue
         layerGroup.beginTime = CACurrentMediaTime() + Constants.resetLinesPositionAnimDuration
         layerGroup.delegate = self
-        layerGroup.fillMode = kCAFillModeBoth
+        layerGroup.fillMode = CAMediaTimingFillMode.both
         layerGroup.isRemovedOnCompletion = false
         assignContext(.LoadingFinishing, anim: layerGroup)
         layer.add(layerGroup, forKey: AnimKeys.bounds)
@@ -582,8 +582,8 @@ extension SubmitButton {
         } else {
             self.layer.backgroundColor = cancelledButtonColor.cgColor
             borderLayer.borderColor = cancelledButtonColor.cgColor
-            setTitle(Constants.cancelButtonTitle, for: UIControlState())
-            setTitleColor(UIColor.white, for: UIControlState())
+            setTitle(Constants.cancelButtonTitle, for: UIControl.State())
+            setTitleColor(UIColor.white, for: UIControl.State())
         }
         finishLoadingGroup.notify(queue: DispatchQueue.main) {
             UIView.animate(withDuration: 0.5, animations: {
@@ -607,8 +607,8 @@ extension SubmitButton {
         layer.opacity     = Constants.minOpacity
         layer.fillColor   = nil
         layer.strokeColor = startBackgroundColor.cgColor
-        layer.lineCap     = kCALineCapRound
-        layer.lineJoin    = kCALineJoinRound
+        layer.lineCap     = CAShapeLayerLineCap.round
+        layer.lineJoin    = CAShapeLayerLineJoin.round
         layer.lineWidth   = lineWidth
         return layer
     }
@@ -632,8 +632,8 @@ extension SubmitButton {
         let percentShiftX: CGFloat = -0.2
         let firstRadius = 0.5 * circleBounds.midY
         let lastRadius  = 1 * circleBounds.midY
-        let firstAngle  = CGFloat(-3 * M_PI_4)
-        let lastAngle   = CGFloat(-1 * M_PI_4)
+        let firstAngle  = CGFloat(-3 * (Double.pi / 4))
+        let lastAngle   = CGFloat(-1 * (Double.pi / 4))
         var startPoint  = CGPoint(x: firstRadius * cos(firstAngle), y: firstRadius * sin(firstAngle))
         var midPoint    = CGPoint.zero
         var endPoint    = CGPoint(x: lastRadius * cos(lastAngle), y: lastRadius * sin(lastAngle))
@@ -674,8 +674,8 @@ extension SubmitButton {
         tempLayer.bounds      = button.frame
         tempLayer.fillColor   = nil
         tempLayer.strokeColor = cancelOptionColor.cgColor
-        tempLayer.lineCap     = kCALineCapRound
-        tempLayer.lineJoin    = kCALineJoinRound
+        tempLayer.lineCap     = CAShapeLayerLineCap.round
+        tempLayer.lineJoin    = CAShapeLayerLineJoin.round
         tempLayer.lineWidth   = lineWidth
         tempLayer.position = CGPoint(x: button.layer.bounds.midX, y: button.layer.bounds.midY)
         tempLayer.path = pathForCrossMark(XShift: Constants.cancelMarkXShift, YShift: Constants.cancelMarkYShift).cgPath
@@ -683,7 +683,7 @@ extension SubmitButton {
         button.addTarget(self, action: #selector(cancelButtonPressed), for: .touchUpInside)
         self.addSubview(button)
     }
-    func cancelButtonPressed() {
+    @objc func cancelButtonPressed() {
         isCancelEnabled = true
         completeAnimation(status: .canceled)
     }
